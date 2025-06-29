@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KICKS BY BL STAFF</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>KICKS BY BL STAFF</h1>
+
+  <button onclick="mostrarSeccion('horarios')">📅 Horarios</button>
+  <button onclick="mostrarSeccion('calculadora')">🧮 Calculadora Nómina</button>
+  <button onclick="mostrarSeccion('salario')">📊 Mi salario esperado</button>
+
+  <div id="horarios" style="display:none;">
+    <h2>Horarios</h2>
+    <h3>Datos salariales</h3>
+
+<label for="salarioBase">Salario base mensual (€):</label>
+<input type="number" id="salarioBase" placeholder="Ejemplo: 1200" />
+
+<button type="button" onclick="guardarSalarioBase()">Guardar salario base</button>
+
+<div id="salarioBaseGuardado"></div>
+    <h3>Introduce tu horario</h3>
+
+    <form id="formHorario">
+      <label for="dia">Día:</label>
+      <select id="dia">
+        <option value="Lunes">Lunes</option>
+        <option value="Martes">Martes</option>
+        <option value="Miércoles">Miércoles</option>
+        <option value="Jueves">Jueves</option>
+        <option value="Viernes">Viernes</option>
+        <option value="Sábado">Sábado</option>
+        <option value="Domingo">Domingo</option>
+      </select>
+    
+      <label for="tipoHora">Tipo de hora:</label>
+      <select id="tipoHora">
+        <option value="normal">Normal</option>
+        <option value="complementaria">Complementaria</option>
+        <option value="festiva">Festiva</option>
+        <option value="nocturna">Nocturna</option>
+      </select>
+    
+      <label for="horaEntrada">Hora de entrada:</label>
+      <input type="time" id="horaEntrada" />
+    
+      <label for="horaSalida">Hora de salida:</label>
+      <input type="time" id="horaSalida" />
+    
+      <button type="button" onclick="guardarHorario()">Guardar horario</button>
+    </form>
+    
+    <div id="horarioGuardado"></div>
+  </div>
+
+  <div id="calculadora" style="display:none;">
+    <h2>Calculadora de la dolorosa 🫠</h2>
+
+    <label for="base">Selecciona base salarial:</label>
+    <select id="base">
+      <option value="1000">12</option>
+      <option value="591.708">16</option>
+      <option value="739.52">20</option>
+      <option value="887.48">24</option>
+      <option value="2000">39</option>
+    </select>
+
+    <label for="horasComp">Número de horas complementarias:</label>
+    <input type="number" id="horasComp" placeholder="Introduce horas complementarias" />
+
+    <label for="horasFest">Número de horas festivas:</label>
+    <input type="number" id="horasFest" placeholder="Introduce horas festivas" />
+
+    <label for="horasNoct">Número de horas nocturnas:</label>
+    <input type="number" id="horasNoct" placeholder="Introduce horas nocturnas" />
+
+    <label for="ssSelect">Seguridad Social (%):</label>
+    <select id="ssSelect" onchange="mostrarPersonalizado()">
+      <option value="6.48">6.48 %</option>
+      <option value="personalizado">Personalizado</option>
+    </select>
+    <input type="number" id="ssPersonalizado" placeholder="Introduce % personalizado" style="display:none;" />
+
+    <label for="irpf">IRPF (%):</label>
+    <input type="number" id="irpf" placeholder="Ejemplo: 12" />
+
+    <button onclick="calcularNomina()">Calcular Nómina</button>
+
+    <div id="resultado"></div>
+    <script>
+    
+      function calcularNomina() {
+        const base = parseFloat(document.getElementById("base").value);
+        const horasComp = parseFloat(document.getElementById("horasComp").value) || 0;
+        const horasFest = parseFloat(document.getElementById("horasFest").value) || 0;
+        const horasNoct = parseFloat(document.getElementById("horasNoct").value) || 0;
+        let ssSelect = document.getElementById("ssSelect").value;
+  let ss;
+  
+  if (ssSelect === "personalizado") {
+    ss = parseFloat(document.getElementById("ssPersonalizado").value) || 0;
+  } else {
+    ss = parseFloat(ssSelect);
+  }
+        const irpf = parseFloat(document.getElementById("irpf").value) || 0;
+        const valorHoraComp = 9.82; 
+        const valorHoraFest = 10.75; 
+        const valorHoraNoct = 2;
+  
+        const bruto = base + (horasComp * valorHoraComp) + (horasFest * valorHoraFest) + (horasNoct * valorHoraNoct);
+        const neto = bruto * (1 - (ss + irpf)/100);
+  
+        document.getElementById("resultado").innerHTML = `
+          Salario bruto: ${bruto.toFixed(2)} €<br>
+          Salario neto: ${neto.toFixed(2)} €
+        `;
+      }
+      function mostrarPersonalizado() {
+    const ssSelect = document.getElementById("ssSelect").value;
+    const ssPersonalizado = document.getElementById("ssPersonalizado");
+    
+    if (ssSelect === "personalizado") {
+      ssPersonalizado.style.display = "block";
+    } else {
+      ssPersonalizado.style.display = "none";
+    }
+  }
+    </script>
+  </div>
+
+  <div id="salario" style="display:none;">
+    <h2>Mi salario esperado</h2>
+    <!-- Aquí mostramos resultados -->
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
