@@ -15,46 +15,61 @@
 
   <div id="horarios" style="display:none;">
     <h2>Horarios</h2>
-    <h3>Datos salariales</h3>
+    
+    <h3>Introduce tu horario semanal</h3>
 
-<label for="salarioBase">Salario base mensual (€):</label>
-<input type="number" id="salarioBase" placeholder="Ejemplo: 1200" />
+<label for="semana">Semana:</label>
+<input type="number" id="semana" min="1" value="1">
 
-<button type="button" onclick="guardarSalarioBase()">Guardar salario base</button>
+<label for="baseHoraria">Base horaria semanal:</label>
+<select id="baseHoraria">
+  <option value="12">12 horas</option>
+  <option value="16">16 horas</option>
+  <option value="20">20 horas</option>
+  <option value="24">24 horas</option>
+</select>
 
-<div id="salarioBaseGuardado"></div>
-    <h3>Introduce tu horario</h3>
+<h4>Horario por día</h4>
+<div id="horasPorDia">
+  <label>Lunes: 
+    <input type="time" class="entradaDia" data-dia="Lunes">
+    <input type="time" class="salidaDia" data-dia="Lunes">
+  </label><br>
 
-    <form id="formHorario">
-      <label for="dia">Día:</label>
-      <select id="dia">
-        <option value="Lunes">Lunes</option>
-        <option value="Martes">Martes</option>
-        <option value="Miércoles">Miércoles</option>
-        <option value="Jueves">Jueves</option>
-        <option value="Viernes">Viernes</option>
-        <option value="Sábado">Sábado</option>
-        <option value="Domingo">Domingo</option>
-      </select>
-    
-      <label for="tipoHora">Tipo de hora:</label>
-      <select id="tipoHora">
-        <option value="normal">Normal</option>
-        <option value="complementaria">Complementaria</option>
-        <option value="festiva">Festiva</option>
-        <option value="nocturna">Nocturna</option>
-      </select>
-    
-      <label for="horaEntrada">Hora de entrada:</label>
-      <input type="time" id="horaEntrada" />
-    
-      <label for="horaSalida">Hora de salida:</label>
-      <input type="time" id="horaSalida" />
-    
-      <button type="button" onclick="guardarHorario()">Guardar horario</button>
-    </form>
-    
-    <div id="horarioGuardado"></div>
+  <label>Martes: 
+    <input type="time" class="entradaDia" data-dia="Martes">
+    <input type="time" class="salidaDia" data-dia="Martes">
+  </label><br>
+
+  <label>Miércoles: 
+    <input type="time" class="entradaDia" data-dia="Miércoles">
+    <input type="time" class="salidaDia" data-dia="Miércoles">
+  </label><br>
+
+  <label>Jueves: 
+    <input type="time" class="entradaDia" data-dia="Jueves">
+    <input type="time" class="salidaDia" data-dia="Jueves">
+  </label><br>
+
+  <label>Viernes: 
+    <input type="time" class="entradaDia" data-dia="Viernes">
+    <input type="time" class="salidaDia" data-dia="Viernes">
+  </label><br>
+
+  <label>Sábado: 
+    <input type="time" class="entradaDia" data-dia="Sábado">
+    <input type="time" class="salidaDia" data-dia="Sábado">
+  </label><br>
+
+  <label>Domingo: 
+    <input type="time" class="entradaDia" data-dia="Domingo">
+    <input type="time" class="salidaDia" data-dia="Domingo">
+  </label><br>
+</div>
+
+<button type="button" onclick="guardarHorarioSemanal()">Añadir / Modificar Horario Semanal</button>
+<h4>Horarios Semanales Guardados</h4>
+<div id="listaHorarios"></div>
   </div>
 
   <div id="calculadora" style="display:none;">
@@ -91,45 +106,6 @@
     <button onclick="calcularNomina()">Calcular Nómina</button>
 
     <div id="resultado"></div>
-    <script>
-    
-      function calcularNomina() {
-        const base = parseFloat(document.getElementById("base").value);
-        const horasComp = parseFloat(document.getElementById("horasComp").value) || 0;
-        const horasFest = parseFloat(document.getElementById("horasFest").value) || 0;
-        const horasNoct = parseFloat(document.getElementById("horasNoct").value) || 0;
-        let ssSelect = document.getElementById("ssSelect").value;
-  let ss;
-  
-  if (ssSelect === "personalizado") {
-    ss = parseFloat(document.getElementById("ssPersonalizado").value) || 0;
-  } else {
-    ss = parseFloat(ssSelect);
-  }
-        const irpf = parseFloat(document.getElementById("irpf").value) || 0;
-        const valorHoraComp = 9.82; 
-        const valorHoraFest = 10.75; 
-        const valorHoraNoct = 2;
-  
-        const bruto = base + (horasComp * valorHoraComp) + (horasFest * valorHoraFest) + (horasNoct * valorHoraNoct);
-        const neto = bruto * (1 - (ss + irpf)/100);
-  
-        document.getElementById("resultado").innerHTML = `
-          Salario bruto: ${bruto.toFixed(2)} €<br>
-          Salario neto: ${neto.toFixed(2)} €
-        `;
-      }
-      function mostrarPersonalizado() {
-    const ssSelect = document.getElementById("ssSelect").value;
-    const ssPersonalizado = document.getElementById("ssPersonalizado");
-    
-    if (ssSelect === "personalizado") {
-      ssPersonalizado.style.display = "block";
-    } else {
-      ssPersonalizado.style.display = "none";
-    }
-  }
-    </script>
   </div>
 
   <div id="salario" style="display:none;">
