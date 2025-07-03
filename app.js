@@ -34,7 +34,6 @@ function guardarHorario() {
   mostrarHorario();
 }
 
-// Mostrar horario individual guardado
 function mostrarHorario() {
   const horario = JSON.parse(localStorage.getItem("horarioEmpleado")) || [];
   let html = "<h3>Horario guardado:</h3><ul>";
@@ -47,7 +46,6 @@ function mostrarHorario() {
   document.getElementById("horarioGuardado").innerHTML = html;
 }
 
-// Guardar salario base
 function guardarSalarioBase() {
   const salarioBase = parseFloat(document.getElementById("salarioBase").value);
   if (!salarioBase || salarioBase <= 0) {
@@ -59,7 +57,6 @@ function guardarSalarioBase() {
   mostrarSalarioBase();
 }
 
-// Mostrar salario base guardado
 function mostrarSalarioBase() {
   const salarioBase = localStorage.getItem("salarioBaseUsuario");
   if (salarioBase) {
@@ -68,7 +65,6 @@ function mostrarSalarioBase() {
   }
 }
 
-// Calculadora de nómina
 function calcularNomina() {
   const base = parseFloat(document.getElementById("base").value);
   const horasComp = parseFloat(document.getElementById("horasComp").value) || 0;
@@ -97,7 +93,6 @@ function calcularNomina() {
   `;
 }
 
-// Mostrar/ocultar campo SS personalizado
 function mostrarPersonalizado() {
   const ssSelect = document.getElementById("ssSelect").value;
   const ssPersonalizado = document.getElementById("ssPersonalizado");
@@ -204,6 +199,139 @@ function limpiarFormularioSemanal() {
   document.querySelectorAll(".salidaDia").forEach(i => i.value = "");
 }
 
+// ----- SALARIO ESPERADO -----
+function calcularSalarioEsperado() {
+  const semanaInicio = parseInt(document.getElementById("semanaInicio").value);
+  const semanaFin = parseInt(document.getElementById("semanaFin").value);
+  const salarioBaseMensual = parseFloat(document.getElementById("salarioBaseMensual").value) || 0;
+  const irpf = parseFloat(document.getElementById("irpfSalario").value) || 0;
+  const valorHoraComp = 9.82;
+
+  if (!semanaInicio || !semanaFin || semanaInicio > semanaFin) {
+    alert("Indica un rango de semanas válido.");
+    return;
+  }
+
+  let horasComplementariasTotales = 0;
+
+  horariosSemanales.forEach(h => {
+    if (h.semana >= semanaInicio && h.semana <= semanaFin) {
+      horasComplementariasTotales += h.complementarias;
+    }
+  });
+
+  const bruto = salarioBaseMensual + (horasComplementariasTotales * valorHoraComp);
+  const neto = bruto * (1 - (irpf / 100));
+
+  document.getElementById("resultadoSalario").innerHTML = `
+    Salario bruto esperado: ${bruto.toFixed(2)} €<br>
+    Salario neto esperado: ${neto.toFixed(2)} €
+  `;
+}
+
+function calcularSalarioEsperado() {
+  const semanaInicio = parseInt(document.getElementById("semanaInicio").value);
+  const semanaFin = parseInt(document.getElementById("semanaFin").value);
+  const baseSeleccionada = parseInt(document.getElementById("baseSalarioEsperado").value);
+  const irpf = parseFloat(document.getElementById("irpfSalario").value) || 0;
+  const valorHoraComp = 9.82;
+
+  if (!semanaInicio || !semanaFin || semanaInicio > semanaFin) {
+    alert("Indica un rango de semanas válido.");
+    return;
+  }
+
+  // Asignamos el salario mensual según la base
+  let salarioBaseMensual = 0;
+  switch (baseSeleccionada) {
+    case 12:
+      salarioBaseMensual = 1000;
+      break;
+    case 16:
+      salarioBaseMensual = 591.71;
+      break;
+    case 20:
+      salarioBaseMensual = 739.52;
+      break;
+    case 24:
+      salarioBaseMensual = 887.48;
+      break;
+    case 39:
+      salarioBaseMensual = 2000;
+      break;
+    default:
+      alert("Base horaria no válida.");
+      return;
+  }
+
+  let horasComplementariasTotales = 0;
+  horariosSemanales.forEach(h => {
+    if (h.semana >= semanaInicio && h.semana <= semanaFin) {
+      horasComplementariasTotales += h.complementarias;
+    }
+  });
+
+  const bruto = salarioBaseMensual + (horasComplementariasTotales * valorHoraComp);
+  const neto = bruto * (1 - (irpf / 100));
+
+  document.getElementById("resultadoSalario").innerHTML = `
+    Salario bruto esperado: ${bruto.toFixed(2)} €<br>
+    Salario neto esperado: ${neto.toFixed(2)} €
+  `;
+}
+function calcularSalarioEsperado() {
+  const semanaInicio = parseInt(document.getElementById("semanaInicio").value);
+  const semanaFin = parseInt(document.getElementById("semanaFin").value);
+  const baseSeleccionada = parseInt(document.getElementById("baseSalarioEsperado").value);
+  const irpf = parseFloat(document.getElementById("irpfSalario").value) || 0;
+  const valorHoraComp = 9.82;
+  const ss = 6.48; // Seguridad Social fija
+
+  if (!semanaInicio || !semanaFin || semanaInicio > semanaFin) {
+    alert("Indica un rango de semanas válido.");
+    return;
+  }
+
+  // Asignamos el salario mensual según la base
+  let salarioBaseMensual = 0;
+  switch (baseSeleccionada) {
+    case 12:
+      salarioBaseMensual = 1000;
+      break;
+    case 16:
+      salarioBaseMensual = 591.71;
+      break;
+    case 20:
+      salarioBaseMensual = 739.52;
+      break;
+    case 24:
+      salarioBaseMensual = 887.48;
+      break;
+    case 39:
+      salarioBaseMensual = 2000;
+      break;
+    default:
+      alert("Base horaria no válida.");
+      return;
+  }
+
+  let horasComplementariasTotales = 0;
+  horariosSemanales.forEach(h => {
+    if (h.semana >= semanaInicio && h.semana <= semanaFin) {
+      horasComplementariasTotales += h.complementarias;
+    }
+  });
+
+  const bruto = salarioBaseMensual + (horasComplementariasTotales * valorHoraComp);
+  const neto = bruto * (1 - ((ss + irpf) / 100));
+
+  document.getElementById("resultadoSalario").innerHTML = `
+    Salario bruto esperado: ${bruto.toFixed(2)} €<br>
+    Seguridad Social: ${ss}%<br>
+    IRPF: ${irpf}%<br>
+    Salario neto esperado: ${neto.toFixed(2)} €
+  `;
+}
 // Al cargar
 document.addEventListener("DOMContentLoaded", () => {
   mostrarHorario();
