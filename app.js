@@ -3,11 +3,10 @@ function mostrarSeccion(seccion) {
   document.getElementById("horarios").style.display = "none";
   document.getElementById("calculadora").style.display = "none";
   document.getElementById("salario").style.display = "none";
-
   document.getElementById(seccion).style.display = "block";
 }
 
-// Guardar horario individual (hora entrada / salida)
+// Guardar horario individual
 function guardarHorario() {
   const dia = document.getElementById("dia").value;
   const tipoHora = document.getElementById("tipoHora").value;
@@ -21,10 +20,8 @@ function guardarHorario() {
 
   const [hEnt, mEnt] = entrada.split(":").map(Number);
   const [hSal, mSal] = salida.split(":").map(Number);
-
   let minutos = (hSal * 60 + mSal) - (hEnt * 60 + mEnt);
-  if (minutos < 0) minutos += 24 * 60; 
-
+  if (minutos < 0) minutos += 24 * 60;
   const numHoras = (minutos / 60).toFixed(2);
 
   let horario = JSON.parse(localStorage.getItem("horarioEmpleado")) || [];
@@ -37,22 +34,20 @@ function guardarHorario() {
 function mostrarHorario() {
   const horario = JSON.parse(localStorage.getItem("horarioEmpleado")) || [];
   let html = "<h3>Horario guardado:</h3><ul>";
-
   horario.forEach(h => {
     html += `<li>${h.dia}: ${h.entrada} - ${h.salida} (${h.numHoras} h, ${h.tipoHora})</li>`;
   });
-
   html += "</ul>";
   document.getElementById("horarioGuardado").innerHTML = html;
 }
 
+// Guardar salario base
 function guardarSalarioBase() {
   const salarioBase = parseFloat(document.getElementById("salarioBase").value);
   if (!salarioBase || salarioBase <= 0) {
     alert("Introduce un salario base válido.");
     return;
   }
-
   localStorage.setItem("salarioBaseUsuario", salarioBase);
   mostrarSalarioBase();
 }
@@ -65,6 +60,7 @@ function mostrarSalarioBase() {
   }
 }
 
+// Calculadora nómina
 function calcularNomina() {
   const base = parseFloat(document.getElementById("base").value);
   const horasComp = parseFloat(document.getElementById("horasComp").value) || 0;
@@ -72,19 +68,12 @@ function calcularNomina() {
   const horasNoct = parseFloat(document.getElementById("horasNoct").value) || 0;
 
   let ssSelect = document.getElementById("ssSelect").value;
-  let ss;
-  if (ssSelect === "personalizado") {
-    ss = parseFloat(document.getElementById("ssPersonalizado").value) || 0;
-  } else {
-    ss = parseFloat(ssSelect);
-  }
+  let ss = (ssSelect === "personalizado")
+    ? (parseFloat(document.getElementById("ssPersonalizado").value) || 0)
+    : parseFloat(ssSelect);
 
   const irpf = parseFloat(document.getElementById("irpf").value) || 0;
-  const valorHoraComp = 9.82;
-  const valorHoraFest = 10.75;
-  const valorHoraNoct = 2;
-
-  const bruto = base + (horasComp * valorHoraComp) + (horasFest * valorHoraFest) + (horasNoct * valorHoraNoct);
+  const bruto = base + (horasComp * 9.82) + (horasFest * 10.75) + (horasNoct * 2);
   const neto = bruto * (1 - (ss + irpf) / 100);
 
   document.getElementById("resultado").innerHTML = `
@@ -95,11 +84,10 @@ function calcularNomina() {
 
 function mostrarPersonalizado() {
   const ssSelect = document.getElementById("ssSelect").value;
-  const ssPersonalizado = document.getElementById("ssPersonalizado");
-  ssPersonalizado.style.display = (ssSelect === "personalizado") ? "block" : "none";
+  document.getElementById("ssPersonalizado").style.display = (ssSelect === "personalizado") ? "block" : "none";
 }
 
-// ----- HORARIO SEMANAL -----
+// HORARIO SEMANAL
 let horariosSemanales = JSON.parse(localStorage.getItem('horariosSemanales')) || [];
 
 function guardarHorarioSemanal() {
@@ -108,47 +96,64 @@ function guardarHorarioSemanal() {
     alert("Por favor, indica un número de semana válido.");
     return;
   }
+
   const base = parseInt(document.getElementById("baseHoraria").value);
   const entradas = document.querySelectorAll(".entradaDia");
   const salidas = document.querySelectorAll(".salidaDia");
+  const festivos = document.querySelectorAll(".festivoDia");
 
   let dias = [];
   let total = 0;
+  let totalFestivas = 0;
+  let totalNocturnas = 0;
 
   entradas.forEach((entradaInput, i) => {
     const diaNombre = entradaInput.dataset.dia;
     const ent = entradaInput.value;
     const sal = salidas[i].value;
+    const esFestivo = festivos[i]?.checked || false;
 
     let horas = 0;
+    let nocturnas = 0;
+
     if (ent && sal) {
       const [hEnt, mEnt] = ent.split(":").map(Number);
       const [hSal, mSal] = sal.split(":").map(Number);
+      let min = (hSal * 60 + mSal) - (hEnt * 60 + mEnt);
+      if (min < 0) min += 24 * 60;
+      horas = +(min / 60).toFixed(2);
 
-      let minutos = (hSal * 60 + mSal) - (hEnt * 60 + mEnt);
-      if (minutos < 0) minutos += 24 * 60;
+      let iniMin = hEnt * 60 + mEnt;
+      let finMin = hSal * 60 + mSal;
+      if (finMin < iniMin) finMin += 24 * 60;
 
-      horas = +(minutos / 60).toFixed(2);
+      // Lógica ajustada: si termina al menos a las 23:00, cuenta nocturnas desde las 22:00
+      if (finMin >= 1380) { // 1380 = 23:00
+        let noctMin = finMin - Math.max(iniMin, 1320); // 1320 = 22:00
+        nocturnas = +(noctMin / 60).toFixed(2);
+      }
     }
+
+    if (esFestivo) totalFestivas += horas;
+    totalNocturnas += nocturnas;
+    total += horas;
 
     dias.push({
       dia: diaNombre,
       entrada: ent || null,
       salida: sal || null,
-      horas
+      horas,
+      festivo: esFestivo,
+      nocturnas
     });
-
-    total += horas;
   });
 
-  const complementarias = total > base ? +(total - base).toFixed(2) : 0;
+  const comp = total > base ? +(total - base).toFixed(2) : 0;
 
   const index = horariosSemanales.findIndex(h => h.semana === semana);
-  if (index >= 0) {
-    horariosSemanales[index] = { semana, base, dias, total, complementarias };
-  } else {
-    horariosSemanales.push({ semana, base, dias, total, complementarias });
-  }
+  const obj = { semana, base, dias, total, complementarias: comp, festivas: totalFestivas, nocturnas: totalNocturnas };
+  if (index >= 0) horariosSemanales[index] = obj;
+  else horariosSemanales.push(obj);
 
   localStorage.setItem('horariosSemanales', JSON.stringify(horariosSemanales));
   renderHorariosSemanales();
@@ -160,13 +165,13 @@ function renderHorariosSemanales() {
   lista.innerHTML = '';
   horariosSemanales.forEach((h, index) => {
     lista.innerHTML += `
-      <div style="margin-bottom: 5px; padding: 4px; border: 1px solid #ccc;">
-        <strong>Semana ${h.semana}</strong> - Total: ${h.total}h - Complementarias: ${h.complementarias}h
+      <div style="border:1px solid #ccc; padding:4px; margin:5px 0;">
+        <strong>Semana ${h.semana}</strong> - Total: ${h.total}h - Comp: ${h.complementarias}h - Fest: ${h.festivas}h - Noct: ${h.nocturnas}h
         <button onclick="editarHorarioSemanal(${index})">Editar</button>
         <button onclick="borrarHorarioSemanal(${index})">Borrar</button>
-        <div>
-          ${h.dias.map(d => `${d.dia}: ${d.entrada || "-"} - ${d.salida || "-"} (${d.horas}h)`).join("<br>")}
-        </div>
+        <div>${h.dias.map(d => 
+          `${d.dia}: ${d.entrada || "-"} - ${d.salida || "-"} (${d.horas}h${d.festivo ? ", Festivo" : ""}${d.nocturnas ? `, Noct: ${d.nocturnas}h` : ""})`
+        ).join("<br>")}</div>
       </div>`;
   });
 }
@@ -175,12 +180,10 @@ function editarHorarioSemanal(index) {
   const h = horariosSemanales[index];
   document.getElementById("semana").value = h.semana;
   document.getElementById("baseHoraria").value = h.base;
-
-  h.dias.forEach(dia => {
-    const entInput = document.querySelector(`.entradaDia[data-dia="${dia.dia}"]`);
-    const salInput = document.querySelector(`.salidaDia[data-dia="${dia.dia}"]`);
-    if (entInput) entInput.value = dia.entrada || "";
-    if (salInput) salInput.value = dia.salida || "";
+  h.dias.forEach(d => {
+    document.querySelector(`.entradaDia[data-dia="${d.dia}"]`).value = d.entrada || "";
+    document.querySelector(`.salidaDia[data-dia="${d.dia}"]`).value = d.salida || "";
+    document.querySelector(`.festivoDia[data-dia="${d.dia}"]`).checked = d.festivo || false;
   });
 }
 
@@ -197,133 +200,36 @@ function limpiarFormularioSemanal() {
   document.getElementById("baseHoraria").value = "12";
   document.querySelectorAll(".entradaDia").forEach(i => i.value = "");
   document.querySelectorAll(".salidaDia").forEach(i => i.value = "");
+  document.querySelectorAll(".festivoDia").forEach(i => i.checked = false);
 }
 
-// ----- SALARIO ESPERADO -----
+// SALARIO ESPERADO
 function calcularSalarioEsperado() {
   const semanaInicio = parseInt(document.getElementById("semanaInicio").value);
   const semanaFin = parseInt(document.getElementById("semanaFin").value);
-  const salarioBaseMensual = parseFloat(document.getElementById("salarioBaseMensual").value) || 0;
+  const baseSel = parseInt(document.getElementById("baseSalarioEsperado").value);
   const irpf = parseFloat(document.getElementById("irpfSalario").value) || 0;
-  const valorHoraComp = 9.82;
+  const ss = 6.48;
 
-  if (!semanaInicio || !semanaFin || semanaInicio > semanaFin) {
-    alert("Indica un rango de semanas válido.");
+  const baseMap = {12: 1000, 16: 591.71, 20: 739.52, 24: 887.48, 39: 2000};
+  const salarioBaseMensual = baseMap[baseSel];
+
+  if (!semanaInicio || !semanaFin || semanaInicio > semanaFin || !salarioBaseMensual) {
+    alert("Rellena correctamente los campos.");
     return;
   }
 
-  let horasComplementariasTotales = 0;
-
+  let comp = 0, fest = 0, noct = 0;
   horariosSemanales.forEach(h => {
     if (h.semana >= semanaInicio && h.semana <= semanaFin) {
-      horasComplementariasTotales += h.complementarias;
+      comp += h.complementarias || 0;
+      fest += h.festivas || 0;
+      noct += h.nocturnas || 0;
     }
   });
 
-  const bruto = salarioBaseMensual + (horasComplementariasTotales * valorHoraComp);
-  const neto = bruto * (1 - (irpf / 100));
-
-  document.getElementById("resultadoSalario").innerHTML = `
-    Salario bruto esperado: ${bruto.toFixed(2)} €<br>
-    Salario neto esperado: ${neto.toFixed(2)} €
-  `;
-}
-
-function calcularSalarioEsperado() {
-  const semanaInicio = parseInt(document.getElementById("semanaInicio").value);
-  const semanaFin = parseInt(document.getElementById("semanaFin").value);
-  const baseSeleccionada = parseInt(document.getElementById("baseSalarioEsperado").value);
-  const irpf = parseFloat(document.getElementById("irpfSalario").value) || 0;
-  const valorHoraComp = 9.82;
-
-  if (!semanaInicio || !semanaFin || semanaInicio > semanaFin) {
-    alert("Indica un rango de semanas válido.");
-    return;
-  }
-
-  // Asignamos el salario mensual según la base
-  let salarioBaseMensual = 0;
-  switch (baseSeleccionada) {
-    case 12:
-      salarioBaseMensual = 1000;
-      break;
-    case 16:
-      salarioBaseMensual = 591.71;
-      break;
-    case 20:
-      salarioBaseMensual = 739.52;
-      break;
-    case 24:
-      salarioBaseMensual = 887.48;
-      break;
-    case 39:
-      salarioBaseMensual = 2000;
-      break;
-    default:
-      alert("Base horaria no válida.");
-      return;
-  }
-
-  let horasComplementariasTotales = 0;
-  horariosSemanales.forEach(h => {
-    if (h.semana >= semanaInicio && h.semana <= semanaFin) {
-      horasComplementariasTotales += h.complementarias;
-    }
-  });
-
-  const bruto = salarioBaseMensual + (horasComplementariasTotales * valorHoraComp);
-  const neto = bruto * (1 - (irpf / 100));
-
-  document.getElementById("resultadoSalario").innerHTML = `
-    Salario bruto esperado: ${bruto.toFixed(2)} €<br>
-    Salario neto esperado: ${neto.toFixed(2)} €
-  `;
-}
-function calcularSalarioEsperado() {
-  const semanaInicio = parseInt(document.getElementById("semanaInicio").value);
-  const semanaFin = parseInt(document.getElementById("semanaFin").value);
-  const baseSeleccionada = parseInt(document.getElementById("baseSalarioEsperado").value);
-  const irpf = parseFloat(document.getElementById("irpfSalario").value) || 0;
-  const valorHoraComp = 9.82;
-  const ss = 6.48; // Seguridad Social fija
-
-  if (!semanaInicio || !semanaFin || semanaInicio > semanaFin) {
-    alert("Indica un rango de semanas válido.");
-    return;
-  }
-
-  // Asignamos el salario mensual según la base
-  let salarioBaseMensual = 0;
-  switch (baseSeleccionada) {
-    case 12:
-      salarioBaseMensual = 1000;
-      break;
-    case 16:
-      salarioBaseMensual = 591.71;
-      break;
-    case 20:
-      salarioBaseMensual = 739.52;
-      break;
-    case 24:
-      salarioBaseMensual = 887.48;
-      break;
-    case 39:
-      salarioBaseMensual = 2000;
-      break;
-    default:
-      alert("Base horaria no válida.");
-      return;
-  }
-
-  let horasComplementariasTotales = 0;
-  horariosSemanales.forEach(h => {
-    if (h.semana >= semanaInicio && h.semana <= semanaFin) {
-      horasComplementariasTotales += h.complementarias;
-    }
-  });
-
-  const bruto = salarioBaseMensual + (horasComplementariasTotales * valorHoraComp);
-  const neto = bruto * (1 - ((ss + irpf) / 100));
+  const bruto = salarioBaseMensual + (comp * 9.82) + (fest * 10.75) + (noct * 2);
+  const neto = bruto * (1 - (ss + irpf) / 100);
 
   document.getElementById("resultadoSalario").innerHTML = `
     Salario bruto esperado: ${bruto.toFixed(2)} €<br>
@@ -332,6 +238,7 @@ function calcularSalarioEsperado() {
     Salario neto esperado: ${neto.toFixed(2)} €
   `;
 }
+
 // Al cargar
 document.addEventListener("DOMContentLoaded", () => {
   mostrarHorario();
