@@ -15,7 +15,6 @@
 
   <div id="horarios" style="display:none;">
     <h2>Horarios</h2>
-    
     <h3>Introduce tu horario semanal</h3>
 
     <label for="semana">Semana:</label>
@@ -30,42 +29,48 @@
     </select>
 
     <h4>Horario por día</h4>
-    <div id="horasPorDia">
-      <label>Lunes: 
-        <input type="time" class="entradaDia" data-dia="Lunes">
-        <input type="time" class="salidaDia" data-dia="Lunes">
-      </label><br>
 
-      <label>Martes: 
-        <input type="time" class="entradaDia" data-dia="Martes">
-        <input type="time" class="salidaDia" data-dia="Martes">
-      </label><br>
+    <label>Lunes:
+      <input type="time" class="entradaDia" data-dia="Lunes">
+      <input type="time" class="salidaDia" data-dia="Lunes">
+      <input type="checkbox" class="festivoDia" data-dia="Lunes"> Festivo
+    </label><br>
+    
+    <label>Martes:
+      <input type="time" class="entradaDia" data-dia="Martes">
+      <input type="time" class="salidaDia" data-dia="Martes">
+      <input type="checkbox" class="festivoDia" data-dia="Martes"> Festivo
+    </label><br>
 
-      <label>Miércoles: 
-        <input type="time" class="entradaDia" data-dia="Miércoles">
-        <input type="time" class="salidaDia" data-dia="Miércoles">
-      </label><br>
+    <label>Miércoles:
+      <input type="time" class="entradaDia" data-dia="Miércoles">
+      <input type="time" class="salidaDia" data-dia="Miércoles">
+      <input type="checkbox" class="festivoDia" data-dia="Miércoles"> Festivo
+    </label><br>
 
-      <label>Jueves: 
-        <input type="time" class="entradaDia" data-dia="Jueves">
-        <input type="time" class="salidaDia" data-dia="Jueves">
-      </label><br>
+    <label>Jueves:
+      <input type="time" class="entradaDia" data-dia="Jueves">
+      <input type="time" class="salidaDia" data-dia="Jueves">
+      <input type="checkbox" class="festivoDia" data-dia="Jueves"> Festivo
+    </label><br>
 
-      <label>Viernes: 
-        <input type="time" class="entradaDia" data-dia="Viernes">
-        <input type="time" class="salidaDia" data-dia="Viernes">
-      </label><br>
+    <label>Viernes:
+      <input type="time" class="entradaDia" data-dia="Viernes">
+      <input type="time" class="salidaDia" data-dia="Viernes">
+      <input type="checkbox" class="festivoDia" data-dia="Viernes"> Festivo
+    </label><br>
 
-      <label>Sábado: 
-        <input type="time" class="entradaDia" data-dia="Sábado">
-        <input type="time" class="salidaDia" data-dia="Sábado">
-      </label><br>
+    <label>Sábado:
+      <input type="time" class="entradaDia" data-dia="Sábado">
+      <input type="time" class="salidaDia" data-dia="Sábado">
+      <input type="checkbox" class="festivoDia" data-dia="Sábado"> Festivo
+    </label><br>
 
-      <label>Domingo: 
-        <input type="time" class="entradaDia" data-dia="Domingo">
-        <input type="time" class="salidaDia" data-dia="Domingo">
-      </label><br>
-    </div>
+    <label>Domingo:
+      <input type="time" class="entradaDia" data-dia="Domingo">
+      <input type="time" class="salidaDia" data-dia="Domingo">
+      <input type="checkbox" class="festivoDia" data-dia="Domingo"> Festivo
+    </label><br>
 
     <button type="button" onclick="guardarHorarioSemanal()">Añadir / Modificar Horario Semanal</button>
     <h4>Horarios Semanales Guardados</h4>
@@ -78,7 +83,7 @@
     <label for="base">Selecciona base salarial:</label>
     <select id="base">
       <option value="1000">12</option>
-      <option value="591.708">16</option>
+      <option value="591.71">16</option>
       <option value="739.52">20</option>
       <option value="887.48">24</option>
       <option value="2000">39</option>
