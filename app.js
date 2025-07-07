@@ -163,7 +163,14 @@ function guardarHorarioSemanal() {
 function renderHorariosSemanales() {
   const lista = document.getElementById('listaHorarios');
   lista.innerHTML = '';
-  horariosSemanales.forEach((h, index) => {
+
+  // Ordenar el array por semana descendente (más nuevo primero)
+  const horariosOrdenados = [...horariosSemanales].sort((a, b) => b.semana - a.semana);
+
+  horariosOrdenados.forEach(h => {
+    // Buscar índice real en el array original para usar en botones
+    const index = horariosSemanales.findIndex(item => item.semana === h.semana);
+
     lista.innerHTML += `
       <div style="border:1px solid #ccc; padding:4px; margin:5px 0;">
         <strong>Semana ${h.semana}</strong> - Total: ${h.total}h - Comp: ${h.complementarias}h - Fest: ${h.festivas}h - Noct: ${h.nocturnas}h
