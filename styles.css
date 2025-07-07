@@ -1,56 +1,56 @@
 body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    max-width: 600px;
-    margin: auto;
-    background-color: #f4f4f4;
-  }
-  
-  h1 {
-    text-align: center;
-    color: #4CAF50;
-  }
-  
-  h2 {
-    color: #333;
-    margin-top: 20px;
-  }
-  
+  background-color: #111;
+  color: #fff;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 1rem;
+  text-align: center;
+  background-color: #222;
+}
+
+button {
+  background-color: #ff3b30; /* rojo estilo SNKRS */
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  margin: 0.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ff1f0f;
+}
+
+div {
+  padding: 1rem;
+}
+
+input, select {
+  padding: 0.5rem;
+  margin: 0.25rem 0;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background-color: #1c1c1e;
+  color: #fff;
+}
+
+#listaHorarios div {
+  background-color: #1c1c1e;
+  border: 1px solid #333;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 600px) {
   button {
-    padding: 10px 20px;
-    margin: 5px 0;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 4px;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  
-  input, select {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
   }
-  
-  #resultado {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #e7f3e7;
-    border: 1px solid #4CAF50;
-    border-radius: 4px;
-    font-weight: bold;
-  }
+}
