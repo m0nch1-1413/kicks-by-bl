@@ -4,14 +4,76 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KICKS BY BL STAFF</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      padding: 1rem;
+      text-align: center;
+      background-color: #222;
+    }
+
+    button {
+      background-color: #ff3b30;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ff1f0f;
+    }
+
+    div {
+      padding: 1rem;
+    }
+
+    input, select {
+      padding: 0.5rem;
+      margin: 0.25rem 0;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background-color: #1c1c1e;
+      color: #fff;
+    }
+
+    label {
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    #listaHorarios div {
+      background-color: #1c1c1e;
+      border: 1px solid #333;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 600px) {
+      button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
   <h1>KICKS BY BL STAFF</h1>
 
   <button onclick="mostrarSeccion('horarios')">📅 Horarios</button>
-  <button onclick="mostrarSeccion('calculadora')">🧮 Calculadora Nómina</button>
   <button onclick="mostrarSeccion('salario')">📊 Mi salario esperado</button>
+  <button onclick="mostrarSeccion('calculadora')">🧮 Calculadora Nómina</button>
 
   <div id="horarios" style="display:none;">
     <h2>Horarios</h2>
@@ -34,47 +96,73 @@
       <input type="time" class="entradaDia" data-dia="Lunes">
       <input type="time" class="salidaDia" data-dia="Lunes">
       <input type="checkbox" class="festivoDia" data-dia="Lunes"> Festivo
-    </label><br>
+    </label>
     
     <label>Martes:
       <input type="time" class="entradaDia" data-dia="Martes">
       <input type="time" class="salidaDia" data-dia="Martes">
       <input type="checkbox" class="festivoDia" data-dia="Martes"> Festivo
-    </label><br>
+    </label>
 
     <label>Miércoles:
       <input type="time" class="entradaDia" data-dia="Miércoles">
       <input type="time" class="salidaDia" data-dia="Miércoles">
       <input type="checkbox" class="festivoDia" data-dia="Miércoles"> Festivo
-    </label><br>
+    </label>
 
     <label>Jueves:
       <input type="time" class="entradaDia" data-dia="Jueves">
       <input type="time" class="salidaDia" data-dia="Jueves">
       <input type="checkbox" class="festivoDia" data-dia="Jueves"> Festivo
-    </label><br>
+    </label>
 
     <label>Viernes:
       <input type="time" class="entradaDia" data-dia="Viernes">
       <input type="time" class="salidaDia" data-dia="Viernes">
       <input type="checkbox" class="festivoDia" data-dia="Viernes"> Festivo
-    </label><br>
+    </label>
 
     <label>Sábado:
       <input type="time" class="entradaDia" data-dia="Sábado">
       <input type="time" class="salidaDia" data-dia="Sábado">
       <input type="checkbox" class="festivoDia" data-dia="Sábado"> Festivo
-    </label><br>
+    </label>
 
     <label>Domingo:
       <input type="time" class="entradaDia" data-dia="Domingo">
       <input type="time" class="salidaDia" data-dia="Domingo">
       <input type="checkbox" class="festivoDia" data-dia="Domingo"> Festivo
-    </label><br>
+    </label>
 
     <button type="button" onclick="guardarHorarioSemanal()">Añadir / Modificar Horario Semanal</button>
     <h4>Horarios Semanales Guardados</h4>
     <div id="listaHorarios"></div>
+  </div>
+
+  <div id="salario" style="display:none;">
+    <h2>Mi salario esperado</h2>
+  
+    <label for="baseSalarioEsperado">Base horaria semanal:</label>
+    <select id="baseSalarioEsperado">
+      <option value="12">12 horas</option>
+      <option value="16">16 horas</option>
+      <option value="20">20 horas</option>
+      <option value="24">24 horas</option>
+      <option value="39">39 horas</option>
+    </select>
+  
+    <label for="semanaInicio">Desde semana:</label>
+    <input type="number" id="semanaInicio" min="1">
+  
+    <label for="semanaFin">Hasta semana:</label>
+    <input type="number" id="semanaFin" min="1">
+  
+    <label for="irpfSalario">IRPF (%):</label>
+    <input type="number" id="irpfSalario" placeholder="Ejemplo: 12">
+  
+    <button onclick="calcularSalarioEsperado()">Calcular Salario Esperado</button>
+  
+    <div id="resultadoSalario"></div>
   </div>
 
   <div id="calculadora" style="display:none;">
@@ -111,32 +199,6 @@
     <button onclick="calcularNomina()">Calcular Nómina</button>
 
     <div id="resultado"></div>
-  </div>
-
-  <div id="salario" style="display:none;">
-    <h2>Mi salario esperado</h2>
-  
-    <label for="baseSalarioEsperado">Base horaria semanal:</label>
-    <select id="baseSalarioEsperado">
-      <option value="12">12 horas</option>
-      <option value="16">16 horas</option>
-      <option value="20">20 horas</option>
-      <option value="24">24 horas</option>
-      <option value="39">39 horas</option>
-    </select>
-  
-    <label for="semanaInicio">Desde semana:</label>
-    <input type="number" id="semanaInicio" min="1">
-  
-    <label for="semanaFin">Hasta semana:</label>
-    <input type="number" id="semanaFin" min="1">
-  
-    <label for="irpfSalario">IRPF (%):</label>
-    <input type="number" id="irpfSalario" placeholder="Ejemplo: 12">
-  
-    <button onclick="calcularSalarioEsperado()">Calcular Salario Esperado</button>
-  
-    <div id="resultadoSalario"></div>
   </div>
 
   <script src="app.js"></script>
