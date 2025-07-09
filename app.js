@@ -90,6 +90,12 @@ function mostrarPersonalizado() {
 // HORARIO SEMANAL
 let horariosSemanales = JSON.parse(localStorage.getItem('horariosSemanales')) || [];
 
+function esHoraValida(hora) {
+  if (!hora) return true;
+  const [h, m] = hora.split(":").map(Number);
+  return m === 0 || m === 30;
+}
+
 function guardarHorarioSemanal() {
   const semana = parseInt(document.getElementById("semana").value);
   if (!semana) {
@@ -106,6 +112,16 @@ function guardarHorarioSemanal() {
   let total = 0;
   let totalFestivas = 0;
   let totalNocturnas = 0;
+
+  for (let i = 0; i < entradas.length; i++) {
+    const ent = entradas[i].value;
+    const sal = salidas[i].value;
+
+    if (!esHoraValida(ent) || !esHoraValida(sal)) {
+      alert("Solo se permiten horas enteras o y media (ej. 08:00, 09:30, etc.)");
+      return;
+    }
+  }
 
   entradas.forEach((entradaInput, i) => {
     const diaNombre = entradaInput.dataset.dia;
@@ -127,9 +143,8 @@ function guardarHorarioSemanal() {
       let finMin = hSal * 60 + mSal;
       if (finMin < iniMin) finMin += 24 * 60;
 
-      // Lógica ajustada: si termina al menos a las 23:00, cuenta nocturnas desde las 22:00
-      if (finMin >= 1380) { // 1380 = 23:00
-        let noctMin = finMin - Math.max(iniMin, 1320); // 1320 = 22:00
+      if (finMin >= 1380) {
+        let noctMin = finMin - Math.max(iniMin, 1320);
         nocturnas = +(noctMin / 60).toFixed(2);
       }
     }
@@ -163,24 +178,22 @@ function guardarHorarioSemanal() {
 function renderHorariosSemanales() {
   const lista = document.getElementById('listaHorarios');
   lista.innerHTML = '';
-
-  // Ordenar el array por semana descendente (más nuevo primero)
-  const horariosOrdenados = [...horariosSemanales].sort((a, b) => b.semana - a.semana);
-
-  horariosOrdenados.forEach(h => {
-    // Buscar índice real en el array original para usar en botones
-    const index = horariosSemanales.findIndex(item => item.semana === h.semana);
-
-    lista.innerHTML += `
-      <div style="border:1px solid #ccc; padding:4px; margin:5px 0;">
-        <strong>Semana ${h.semana}</strong> - Total: ${h.total}h - Comp: ${h.complementarias}h - Fest: ${h.festivas}h - Noct: ${h.nocturnas}h
-        <button onclick="editarHorarioSemanal(${index})">Editar</button>
-        <button onclick="borrarHorarioSemanal(${index})">Borrar</button>
-        <div>${h.dias.map(d => 
-          `${d.dia}: ${d.entrada || "-"} - ${d.salida || "-"} (${d.horas}h${d.festivo ? ", Festivo" : ""}${d.nocturnas ? `, Noct: ${d.nocturnas}h` : ""})`
-        ).join("<br>")}</div>
-      </div>`;
-  });
+  horariosSemanales
+    .sort((a, b) => b.semana - a.semana)
+    .forEach((h, index) => {
+      lista.innerHTML += `
+        <div class="horario-card">
+          <strong>Semana ${h.semana}</strong><br>
+          Total: ${h.total}h - Comp: ${h.complementarias}h - Fest: ${h.festivas}h - Noct: ${h.nocturnas}h
+          <div style="margin-top: 0.5rem;">
+            <button onclick="editarHorarioSemanal(${index})">Editar</button>
+            <button onclick="borrarHorarioSemanal(${index})">Borrar</button>
+          </div>
+          <div style="margin-top: 0.5rem;">${h.dias.map(d => 
+            `${d.dia}: ${d.entrada || "-"} - ${d.salida || "-"} (${d.horas}h${d.festivo ? ", Festivo" : ""}${d.nocturnas ? `, Noct: ${d.nocturnas}h` : ""})`
+          ).join("<br>")}</div>
+        </div>`;
+    });
 }
 
 function editarHorarioSemanal(index) {
