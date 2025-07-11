@@ -3,7 +3,13 @@ function mostrarSeccion(seccion) {
   document.getElementById("horarios").style.display = "none";
   document.getElementById("calculadora").style.display = "none";
   document.getElementById("salario").style.display = "none";
+  document.getElementById("calendarioVisual").style.display = "none";
+
   document.getElementById(seccion).style.display = "block";
+
+  if (seccion === "calendarioVisual") {
+    mostrarCalendarioVisual();
+  }
 }
 
 // Guardar horario individual
@@ -87,6 +93,15 @@ function mostrarPersonalizado() {
   document.getElementById("ssPersonalizado").style.display = (ssSelect === "personalizado") ? "block" : "none";
 }
 
+// Variables globales para mes y año visibles
+let mesVisible = new Date().getMonth();
+let añoVisible = new Date().getFullYear();
+
+const mesesNombres = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
+
 // HORARIO SEMANAL
 let horariosSemanales = JSON.parse(localStorage.getItem('horariosSemanales')) || [];
 
@@ -98,20 +113,28 @@ function esHoraValida(hora) {
 
 function guardarHorarioSemanal() {
   const semana = parseInt(document.getElementById("semana").value);
+  const base = parseInt(document.getElementById("baseHoraria").value);
+
+  const fechaInicioStr = document.getElementById("fechaInicioSemana").value;
+  const fechaFinStr = document.getElementById("fechaFinSemana").value;
+
+  if (!fechaInicioStr || !fechaFinStr) {
+    alert("Debes indicar fecha de inicio y fin de la semana.");
+    return;
+  }
+
+  const fechaInicio = new Date(fechaInicioStr);
+  const fechaFin = new Date(fechaFinStr);
+
   if (!semana) {
     alert("Por favor, indica un número de semana válido.");
     return;
   }
 
-  const base = parseInt(document.getElementById("baseHoraria").value);
   const entradas = document.querySelectorAll(".entradaDia");
   const salidas = document.querySelectorAll(".salidaDia");
   const festivos = document.querySelectorAll(".festivoDia");
-
-  let dias = [];
-  let total = 0;
-  let totalFestivas = 0;
-  let totalNocturnas = 0;
+  const libres = document.querySelectorAll(".libreDia");
 
   for (let i = 0; i < entradas.length; i++) {
     const ent = entradas[i].value;
@@ -123,11 +146,17 @@ function guardarHorarioSemanal() {
     }
   }
 
+  let dias = [];
+  let total = 0;
+  let totalFestivas = 0;
+  let totalNocturnas = 0;
+
   entradas.forEach((entradaInput, i) => {
-    const diaNombre = entradaInput.dataset.dia;
+    const diaNombre = entradaInput.dataset.dia.toLowerCase();
     const ent = entradaInput.value;
     const sal = salidas[i].value;
     const esFestivo = festivos[i]?.checked || false;
+    const esLibre = libres[i]?.checked || false;
 
     let horas = 0;
     let nocturnas = 0;
@@ -159,6 +188,7 @@ function guardarHorarioSemanal() {
       salida: sal || null,
       horas,
       festivo: esFestivo,
+      libre: esLibre,
       nocturnas
     });
   });
@@ -166,7 +196,7 @@ function guardarHorarioSemanal() {
   const comp = total > base ? +(total - base).toFixed(2) : 0;
 
   const index = horariosSemanales.findIndex(h => h.semana === semana);
-  const obj = { semana, base, dias, total, complementarias: comp, festivas: totalFestivas, nocturnas: totalNocturnas };
+  const obj = { semana, base, dias, total, complementarias: comp, festivas: totalFestivas, nocturnas: totalNocturnas, fechaInicio: fechaInicioStr, fechaFin: fechaFinStr };
   if (index >= 0) horariosSemanales[index] = obj;
   else horariosSemanales.push(obj);
 
@@ -190,7 +220,7 @@ function renderHorariosSemanales() {
             <button onclick="borrarHorarioSemanal(${index})">Borrar</button>
           </div>
           <div style="margin-top: 0.5rem;">${h.dias.map(d => 
-            `${d.dia}: ${d.entrada || "-"} - ${d.salida || "-"} (${d.horas}h${d.festivo ? ", Festivo" : ""}${d.nocturnas ? `, Noct: ${d.nocturnas}h` : ""})`
+            `${d.dia}: ${d.entrada || "-"} - ${d.salida || "-"} (${d.horas}h${d.festivo ? ", Festivo" : ""}${d.libre ? ", Libre" : ""}${d.nocturnas ? `, Noct: ${d.nocturnas}h` : ""})`
           ).join("<br>")}</div>
         </div>`;
     });
@@ -201,9 +231,11 @@ function editarHorarioSemanal(index) {
   document.getElementById("semana").value = h.semana;
   document.getElementById("baseHoraria").value = h.base;
   h.dias.forEach(d => {
-    document.querySelector(`.entradaDia[data-dia="${d.dia}"]`).value = d.entrada || "";
-    document.querySelector(`.salidaDia[data-dia="${d.dia}"]`).value = d.salida || "";
-    document.querySelector(`.festivoDia[data-dia="${d.dia}"]`).checked = d.festivo || false;
+    const diaCapitalizado = d.dia.charAt(0).toUpperCase() + d.dia.slice(1);
+    document.querySelector(`.entradaDia[data-dia="${diaCapitalizado}"]`).value = d.entrada || "";
+    document.querySelector(`.salidaDia[data-dia="${diaCapitalizado}"]`).value = d.salida || "";
+    document.querySelector(`.festivoDia[data-dia="${diaCapitalizado}"]`).checked = d.festivo || false;
+    document.querySelector(`.libreDia[data-dia="${diaCapitalizado}"]`).checked = d.libre || false;
   });
 }
 
@@ -221,6 +253,7 @@ function limpiarFormularioSemanal() {
   document.querySelectorAll(".entradaDia").forEach(i => i.value = "");
   document.querySelectorAll(".salidaDia").forEach(i => i.value = "");
   document.querySelectorAll(".festivoDia").forEach(i => i.checked = false);
+  document.querySelectorAll(".libreDia").forEach(i => i.checked = false);
 }
 
 // SALARIO ESPERADO
@@ -259,9 +292,117 @@ function calcularSalarioEsperado() {
   `;
 }
 
+// CALENDARIO VISUAL
+function mostrarCalendarioVisual() {
+  const contenedor = document.getElementById("contenedorCalendario");
+  contenedor.innerHTML = "";
+
+  const primerLunes = new Date("2025-02-03");
+  const horarios = JSON.parse(localStorage.getItem("horariosSemanales")) || [];
+
+  const añoActual = añoVisible;
+  const mesActual = mesVisible;
+
+  // Mostrar mes y año en el label
+  document.getElementById("mesActualLabel").textContent = mesesNombres[mesActual] + " " + añoActual;
+
+  const primerDiaMes = new Date(añoActual, mesActual, 1);
+  const ultimoDiaMes = new Date(añoActual, mesActual + 1, 0);
+
+  const diasEnMes = ultimoDiaMes.getDate();
+  const primerDiaSemana = (primerDiaMes.getDay() + 6) % 7; // ajustar para lunes como día 0
+
+  const calendario = document.createElement("div");
+  calendario.className = "calendario-grid";
+
+  // Cabecera días de la semana
+  ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].forEach(dia => {
+    const celda = document.createElement("div");
+    celda.className = "calendario-header";
+    celda.textContent = dia;
+    calendario.appendChild(celda);
+  });
+
+  // Celdas vacías previas
+  for (let i = 0; i < primerDiaSemana; i++) {
+    const celdaVacia = document.createElement("div");
+    celdaVacia.className = "calendario-dia empty";
+    calendario.appendChild(celdaVacia);
+  }
+
+  for (let dia = 1; dia <= diasEnMes; dia++) {
+    const celda = document.createElement("div");
+    celda.className = "calendario-dia";
+    const fechaActual = new Date(añoActual, mesActual, dia);
+
+    let datosDia = null;
+    let datosSemana = horarios.find(h => {
+      const ini = new Date(h.fechaInicio);
+      const fin = new Date(h.fechaFin);
+      return fechaActual >= ini && fechaActual <= fin;
+    });
+    if (datosSemana) {
+      const nombresDias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+      let diaNombre = nombresDias[fechaActual.getDay()];
+      diaNombre = diaNombre
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      console.log("Buscando día:", diaNombre);
+
+      datosSemana.dias.forEach(d => {
+        console.log("Día en datos:", d.dia);
+      });
+
+      datosDia = datosSemana.dias.find(d =>
+        d.dia
+          .toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "") === diaNombre
+      );
+    }
+
+    let contenido = `<strong>${dia}</strong>`;
+    if (datosDia) {
+      contenido += `<div style="font-size:0.75rem;">${datosDia.entrada || "-"} - ${datosDia.salida || "-"}</div>`;
+      if (datosDia.festivo) contenido += `<div class="festivo-label">Festivo</div>`;
+      if (datosDia.libre) contenido += `<div class="libre-label">Día libre</div>`;
+    }
+    if (datosDia && datosDia.libre) {
+      celda.classList.add("libre");
+    }
+
+    celda.innerHTML = contenido;
+    calendario.appendChild(celda);
+  }
+
+  contenedor.appendChild(calendario);
+}
+
+// Navegación mes calendario
+document.getElementById("btnMesAnterior").addEventListener("click", () => {
+  if (mesVisible === 0) {
+    mesVisible = 11;
+    añoVisible--;
+  } else {
+    mesVisible--;
+  }
+  mostrarCalendarioVisual();
+});
+
+document.getElementById("btnMesSiguiente").addEventListener("click", () => {
+  if (mesVisible === 11) {
+    mesVisible = 0;
+    añoVisible++;
+  } else {
+    mesVisible++;
+  }
+  mostrarCalendarioVisual();
+});
+
 // Al cargar
 document.addEventListener("DOMContentLoaded", () => {
   mostrarHorario();
   mostrarSalarioBase();
   renderHorariosSemanales();
+  mostrarCalendarioVisual();
 });
