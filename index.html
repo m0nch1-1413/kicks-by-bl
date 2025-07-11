@@ -12,9 +12,11 @@
   <h1>KICKS BY BL STAFF</h1>
 
   <button onclick="mostrarSeccion('horarios')">📅 Horarios</button>
+  <button onclick="mostrarSeccion('calendarioVisual')">📆 Ver Calendario Visual</button>
   <button onclick="mostrarSeccion('salario')">📊 Mi salario esperado</button>
   <button onclick="mostrarSeccion('calculadora')">🧮 Calculadora Nómina</button>
 
+  
   <div id="horarios" style="display:none;">
     <h2>Horarios</h2>
     <h3>Introduce tu horario semanal</h3>
@@ -30,53 +32,76 @@
       <option value="24">24 horas</option>
     </select>
 
+    <label for="fechaInicioSemana">Fecha inicio de semana:</label>
+    <input type="date" id="fechaInicioSemana">
+
+    <label for="fechaFinSemana">Fecha fin de semana:</label>
+    <input type="date" id="fechaFinSemana">
+
     <h4>Horario por día</h4>
 
     <label>Lunes:
       <input type="time" class="entradaDia" data-dia="Lunes">
       <input type="time" class="salidaDia" data-dia="Lunes">
       <input type="checkbox" class="festivoDia" data-dia="Lunes"> Festivo
+      <input type="checkbox" class="libreDia" data-dia="Lunes"> Día libre
     </label>
     
     <label>Martes:
       <input type="time" class="entradaDia" data-dia="Martes">
       <input type="time" class="salidaDia" data-dia="Martes">
       <input type="checkbox" class="festivoDia" data-dia="Martes"> Festivo
+      <input type="checkbox" class="libreDia" data-dia="Martes"> Día libre
     </label>
 
     <label>Miércoles:
       <input type="time" class="entradaDia" data-dia="Miércoles">
       <input type="time" class="salidaDia" data-dia="Miércoles">
       <input type="checkbox" class="festivoDia" data-dia="Miércoles"> Festivo
+      <input type="checkbox" class="libreDia" data-dia="Miércoles"> Día libre
     </label>
 
     <label>Jueves:
       <input type="time" class="entradaDia" data-dia="Jueves">
       <input type="time" class="salidaDia" data-dia="Jueves">
       <input type="checkbox" class="festivoDia" data-dia="Jueves"> Festivo
+      <input type="checkbox" class="libreDia" data-dia="Jueves"> Día libre
     </label>
 
     <label>Viernes:
       <input type="time" class="entradaDia" data-dia="Viernes">
       <input type="time" class="salidaDia" data-dia="Viernes">
       <input type="checkbox" class="festivoDia" data-dia="Viernes"> Festivo
+      <input type="checkbox" class="libreDia" data-dia="Viernes"> Día libre
     </label>
 
     <label>Sábado:
       <input type="time" class="entradaDia" data-dia="Sábado">
       <input type="time" class="salidaDia" data-dia="Sábado">
       <input type="checkbox" class="festivoDia" data-dia="Sábado"> Festivo
+      <input type="checkbox" class="libreDia" data-dia="Sábado"> Día libre
     </label>
 
     <label>Domingo:
       <input type="time" class="entradaDia" data-dia="Domingo">
       <input type="time" class="salidaDia" data-dia="Domingo">
       <input type="checkbox" class="festivoDia" data-dia="Domingo"> Festivo
+      <input type="checkbox" class="libreDia" data-dia="Domingo"> Día libre
     </label>
 
     <button type="button" onclick="guardarHorarioSemanal()">Añadir / Modificar Horario Semanal</button>
     <h4>Horarios Semanales Guardados</h4>
     <div id="listaHorarios"></div>
+  </div>
+
+  <div id="calendarioVisual" style="display:none; background-color:#1c1c1e; border-radius:8px; padding:1rem; margin-top:1rem;">
+    <h2>Calendario Visual de Horarios</h2>
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <button id="btnMesAnterior">◀️ Mes anterior</button>
+      <div id="mesActualLabel" style="font-weight: bold; color: #fff;"></div>
+      <button id="btnMesSiguiente">▶️ Mes siguiente</button>
+    </div>
+    <div id="contenedorCalendario"></div>
   </div>
 
   <div id="salario" style="display:none;">
