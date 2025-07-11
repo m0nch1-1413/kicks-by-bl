@@ -4,7 +4,6 @@ body {
   font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 1rem;
-  box-sizing: border-box;
 }
 
 h1 {
@@ -23,24 +22,18 @@ button {
   border-radius: 4px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
 button:hover {
   background-color: #ff1f0f;
 }
 
-#horarios,
-#salario,
-#calculadora {
+#horarios, #salario, #calculadora, #calendarioVisual {
   background-color: #1c1c1e;
   border-radius: 8px;
   padding: 1rem;
   margin-top: 1rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  box-sizing: border-box;
+  color: #fff;
 }
 
 label {
@@ -48,8 +41,7 @@ label {
   margin-top: 0.5rem;
 }
 
-input,
-select {
+input, select {
   width: 100%;
   padding: 0.5rem;
   margin: 0.25rem 0;
@@ -57,45 +49,249 @@ select {
   border-radius: 4px;
   background-color: #2a2a2a;
   color: #fff;
-  box-sizing: border-box;
 }
 
-#listaHorarios {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
+#listaHorarios div.horario-card {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
 }
 
-.horario-card {
-  width: 100%;
-  border: 2px solid red;
-  background-color: #1a1a1a;
-  border-radius: 10px;
-  color: white;
-  padding: 1rem;
-  box-sizing: border-box;
-}
-
-#resultado,
-#resultadoSalario {
+#resultado, #resultadoSalario {
   margin-top: 1rem;
   background-color: #2a2a2a;
   padding: 1rem;
   border-radius: 4px;
 }
 
+/* Calendario Visual */
+#contenedorCalendario {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+#contenedorCalendario > div {
+  background-color: #292929;
+  border-radius: 6px;
+  padding: 1rem;
+  border: 1px solid #444;
+}
+
+#contenedorCalendario strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+#contenedorCalendario div > div {
+  margin-left: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
   button {
     width: 100%;
   }
-
-  input,
-  select {
-    font-size: 1rem;
+  #contenedorCalendario > div {
+    padding: 0.7rem;
+    font-size: 0.85rem;
   }
+}
 
-  .horario-card {
-    width: 100%;
-  }
+/* Calendario mensual tipo Apple Calendar */
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 1rem;
+}
+
+.calendario-header {
+  text-align: center;
+  font-weight: bold;
+  background-color: #2a2a2a;
+  padding: 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.calendario-dia {
+  background-color: #1c1c1e;
+  border: 1px solid #333;
+  min-height: 70px;
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.calendario-dia strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.calendario-dia.empty {
+  background: transparent;
+  border: none;
+}
+
+.festivo-label {
+  color: #ff3b30;
+  font-weight: bold;
+  font-size: 0.7rem;
+} 
+
+/* Botones navegación calendario */
+#calendarioVisual > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+#calendarioVisual button#btnMesAnterior,
+#calendarioVisual button#btnMesSiguiente {
+  background-color: #ff3b30;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#calendarioVisual button#btnMesAnterior:hover,
+#calendarioVisual button#btnMesSiguiente:hover {
+  background-color: #ff1f0f;
+}
+
+#mesActualLabel {
+  font-weight: bold;
+  color: #fff;
+  font-size: 1rem;
+  user-select: none;
+}
+/* Estilo para días libres en calendario visual */
+.calendario-dia.libre {
+  background-color: #117a37 !important;
+  color: #d0f0c0;
+  font-weight: bold;
+}
+
+.libre-label {
+  color: #a8e6a3;
+  font-weight: bold;
+  font-size: 0.7rem;
+  margin-top: 4px;
+}
+
+/* Inputs de fecha en horarios */
+#fechaInicioSemana, #fechaFinSemana {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.25rem 0 0.75rem 0;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background-color: #2a2a2a;
+  color: #fff;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+/* Mantener estilos para días libres en calendario visual */
+.calendario-dia.libre {
+  background-color: #117a37 !important;
+  color: #d0f0c0;
+  font-weight: bold;
+}
+
+.libre-label {
+  color: #a8e6a3;
+  font-weight: bold;
+  font-size: 0.7rem;
+  margin-top: 4px;
+}
+
+/* Estilos para días festivos */
+.festivo-label {
+  color: #ff3b30;
+  font-weight: bold;
+  font-size: 0.7rem;
+}
+
+/* Calendario mensual tipo Apple Calendar */
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-top: 1rem;
+}
+
+.calendario-header {
+  text-align: center;
+  font-weight: bold;
+  background-color: #2a2a2a;
+  padding: 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.calendario-dia {
+  background-color: #1c1c1e;
+  border: 1px solid #333;
+  min-height: 70px;
+  padding: 4px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.calendario-dia strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.calendario-dia.empty {
+  background: transparent;
+  border: none;
+}
+
+/* Botones navegación calendario */
+#calendarioVisual > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+#calendarioVisual button#btnMesAnterior,
+#calendarioVisual button#btnMesSiguiente {
+  background-color: #ff3b30;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#calendarioVisual button#btnMesAnterior:hover,
+#calendarioVisual button#btnMesSiguiente:hover {
+  background-color: #ff1f0f;
+}
+
+#mesActualLabel {
+  font-weight: bold;
+  color: #fff;
+  font-size: 1rem;
+  user-select: none;
 }
