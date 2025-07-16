@@ -193,33 +193,6 @@ input, select {
   margin-top: 4px;
 }
 
-/* Inputs de fecha en horarios */
-#fechaInicioSemana, #fechaFinSemana {
-  width: 100%;
-  padding: 0.5rem;
-  margin: 0.25rem 0 0.75rem 0;
-  border: 1px solid #333;
-  border-radius: 4px;
-  background-color: #2a2a2a;
-  color: #fff;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-/* Mantener estilos para días libres en calendario visual */
-.calendario-dia.libre {
-  background-color: #117a37 !important;
-  color: #d0f0c0;
-  font-weight: bold;
-}
-
-.libre-label {
-  color: #a8e6a3;
-  font-weight: bold;
-  font-size: 0.7rem;
-  margin-top: 4px;
-}
-
 /* Estilos para días festivos */
 .festivo-label {
   color: #ff3b30;
@@ -294,4 +267,30 @@ input, select {
   color: #fff;
   font-size: 1rem;
   user-select: none;
+}
+/* Mejora visualización móvil del calendario visual*/
+@media (max-width: 600px) {
+  /* Contenedor con scroll horizontal para calendario */
+  #calendarioVisual .calendario-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(90px, 1fr);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+  }
+
+  /* Ajuste tamaño y padding de cada día */
+  .calendario-dia {
+    min-width: 90px;
+    min-height: 90px;
+    padding: 6px;
+    font-size: 0.85rem;
+  }
+
+  /* Ajustar el header del calendario para que tenga buen tamaño */
+  .calendario-header {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+  }
 }
