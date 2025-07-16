@@ -7,6 +7,10 @@ function mostrarSeccion(seccion) {
 
   document.getElementById(seccion).style.display = "block";
 
+  if (seccion === "horarios") {
+    renderHorariosSemanales();
+  }
+
   if (seccion === "calendarioVisual") {
     mostrarCalendarioVisual();
   }
@@ -336,17 +340,18 @@ function mostrarCalendarioVisual() {
     const fechaActual = new Date(añoActual, mesActual, dia);
 
     let datosDia = null;
+    function soloFecha(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
     let datosSemana = horarios.find(h => {
-      const ini = new Date(h.fechaInicio);
-      const fin = new Date(h.fechaFin);
-      return fechaActual >= ini && fechaActual <= fin;
+      const ini = soloFecha(new Date(h.fechaInicio));
+      const fin = soloFecha(new Date(h.fechaFin));
+      const actual = soloFecha(fechaActual);
+      return actual >= ini && actual <= fin;
     });
     if (datosSemana) {
-      const nombresDias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-      let diaNombre = nombresDias[fechaActual.getDay()];
-      diaNombre = diaNombre
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const nombresDias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+      let diaNombre = nombresDias[(fechaActual.getDay() + 6) % 7];
 
       console.log("Buscando día:", diaNombre);
 
@@ -354,11 +359,11 @@ function mostrarCalendarioVisual() {
         console.log("Día en datos:", d.dia);
       });
 
-      datosDia = datosSemana.dias.find(d =>
-        d.dia
-          .toLowerCase()
-          .normalize("NFD").replace(/[\u0300-\u036f]/g, "") === diaNombre
-      );
+      datosDia = datosSemana.dias.find(d => {
+        const nombreDiaDatos = d.dia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const nombreDiaReferencia = diaNombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return nombreDiaDatos === nombreDiaReferencia;
+      });
     }
 
     let contenido = `<strong>${dia}</strong>`;
