@@ -1,141 +1,400 @@
-body {
-  background-color: #111;
-  color: #fff;
-  font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+/* --- VARIABLES Y SETUP GENERAL --- */
+:root {
+  --bg-main: #111111;
+  --bg-card: #1c1c1e;
+  --bg-input: #2a2a2a;
+  --accent-color: #ff3b30;
+  --accent-hover: #ff1f0f;
+  --text-main: #ffffff;
+  --text-muted: #a1a1a6;
+  --border-color: #333333;
+  --status-libre: #117a37;
+  --status-libre-text: #d0f0c0;
+  --ok-color: #30d158;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --tap-min: 48px;           /* tamaño mínimo cómodo para el pulgar */
+  --nav-h: 64px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  padding: 1rem;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
+  /* hueco para notch, barra de gestos y navegación inferior */
+  padding:
+    calc(0.75rem + var(--safe-top))
+    calc(0.75rem + env(safe-area-inset-right, 0px))
+    calc(var(--nav-h) + var(--safe-bottom) + 1rem)
+    calc(0.75rem + env(safe-area-inset-left, 0px));
+}
+
+.contenedor-principal {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 1.35rem;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
 }
 
+h3 {
+  font-size: 1.05rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+/* --- BOTONES --- */
 button {
-  background-color: #ff3b30;
-  color: #fff;
+  background-color: var(--accent-color);
+  color: var(--text-main);
   border: none;
-  padding: 0.75rem 1.5rem;
-  margin: 0.5rem;
-  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  min-height: var(--tap-min);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
   font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.2s ease;
 }
 
-button:hover {
-  background-color: #ff1f0f;
+button:hover { background-color: var(--accent-hover); }
+button:active { transform: scale(0.98); }
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--text-main);
+  outline-offset: 2px;
 }
 
-#horarios, #salario, #calculadora, #calendarioVisual {
-  background-color: #1c1c1e;
-  border-radius: 8px;
-  padding: 1rem;
+.btn-primario {
+  width: 100%;
   margin-top: 1rem;
-  color: #fff;
+  min-height: 54px;
+  font-size: 1.05rem;
 }
+
+.btn-icono {
+  width: var(--tap-min);
+  padding: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* --- BARRA DE NAVEGACIÓN INFERIOR --- */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background-color: rgba(28, 28, 30, 0.94);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border-color);
+  padding-bottom: var(--safe-bottom);
+}
+
+.bottom-nav button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: var(--nav-h);
+  padding: 6px 2px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.bottom-nav button:hover { background: transparent; }
+.bottom-nav button:active { transform: none; background: var(--bg-input); }
+
+.bottom-nav button[aria-current="page"] {
+  color: var(--accent-color);
+}
+
+.nav-icon {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --- MÓDULOS Y CARDS --- */
+.modulo-card {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-top: 0.75rem;
+  border: 1px solid var(--border-color);
+}
+
+.modulo-card h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.separador {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  margin: 1.5rem 0;
+}
+
+/* --- FORMULARIOS (mobile-first: 1 columna) --- */
+.grid-form-2,
+.grid-form-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.form-group { margin-bottom: 0.75rem; }
 
 label {
   display: block;
-  margin-top: 0.5rem;
-}
-
-input, select {
-  width: 100%;
-  padding: 0.5rem;
-  margin: 0.25rem 0;
-  border: 1px solid #333;
-  border-radius: 4px;
-  background-color: #2a2a2a;
-  color: #fff;
-}
-
-#listaHorarios div.horario-card {
-  background-color: #2a2a2a;
-  border: 1px solid #444;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 6px;
-}
-
-#resultado, #resultadoSalario {
-  margin-top: 1rem;
-  background-color: #2a2a2a;
-  padding: 1rem;
-  border-radius: 4px;
-}
-
-/* Calendario Visual */
-#contenedorCalendario {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-#contenedorCalendario > div {
-  background-color: #292929;
-  border-radius: 6px;
-  padding: 1rem;
-  border: 1px solid #444;
-}
-
-#contenedorCalendario strong {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 700;
-  font-size: 1.1rem;
-}
-
-#contenedorCalendario div > div {
-  margin-left: 1rem;
   font-size: 0.9rem;
-  line-height: 1.3;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  button {
-    width: 100%;
-  }
-  #contenedorCalendario > div {
-    padding: 0.7rem;
-    font-size: 0.85rem;
-  }
+/* font-size 16px evita el zoom automático de iOS al enfocar un input */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+select {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 1rem;
 }
 
-/* Calendario mensual tipo Apple Calendar */
+input[type="date"],
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: left;
+}
+
+/* --- TARJETA POR DÍA --- */
+.dia-form-group {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.dia-label {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+.dia-horas,
+.dia-opciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.dia-opciones { margin-top: 0.6rem; }
+
+.campo-hora { margin: 0; }
+
+.dia-form-group input[type="time"] {
+  min-height: 56px;
+  font-size: 1.15rem;
+  background-color: var(--bg-card);
+}
+
+/* Chips táctiles para Festivo / Libre */
+.chip {
+  position: relative;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.chip input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.chip span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-min);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.chip input:checked + span {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--text-main);
+}
+
+.chip--libre input:checked + span {
+  background-color: var(--status-libre);
+  border-color: var(--status-libre);
+  color: var(--status-libre-text);
+}
+
+.chip input:focus-visible + span {
+  outline: 2px solid var(--text-main);
+  outline-offset: 2px;
+}
+
+/* --- TARJETAS DE HORARIOS GUARDADOS --- */
+.horario-card {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.horario-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.horario-card-acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.horario-card-acciones button {
+  font-size: 0.95rem;
+}
+
+.btn-editar {
+  background-color: #2c2c2e;
+  border: 1px solid var(--border-color);
+}
+
+.btn-editar:hover { background-color: #3a3a3c; }
+
+.btn-borrar {
+  background-color: #3a1c1c;
+  color: #ff453a;
+}
+
+.btn-borrar:hover { background-color: #4a2020; }
+
+.horario-card-dias {
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.horario-card-dias li { padding: 2px 0; }
+
+/* --- CALENDARIO VISUAL (sin scroll horizontal) --- */
+.calendario-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+#mesActualLabel {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 .calendario-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 1rem;
+  grid-template-columns: repeat(7, minmax(0, 1fr)); /* minmax(0) impide que el contenido ensanche columnas */
+  gap: 3px;
 }
 
 .calendario-header {
   text-align: center;
-  font-weight: bold;
-  background-color: #2a2a2a;
-  padding: 0.4rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  font-weight: 700;
+  background-color: var(--bg-input);
+  padding: 0.35rem 0;
+  border-radius: 6px;
+  font-size: 0.7rem;
 }
 
 .calendario-dia {
-  background-color: #1c1c1e;
-  border: 1px solid #333;
-  min-height: 70px;
-  padding: 4px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  min-height: 62px;
+  padding: 3px;
   border-radius: 6px;
-  font-size: 0.8rem;
-  color: #fff;
+  font-size: 0.65rem;
+  line-height: 1.25;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .calendario-dia strong {
   display: block;
-  font-size: 1rem;
-  margin-bottom: 4px;
+  font-size: 0.85rem;
+  margin-bottom: 2px;
 }
 
 .calendario-dia.empty {
@@ -143,154 +402,84 @@ input, select {
   border: none;
 }
 
-.festivo-label {
-  color: #ff3b30;
-  font-weight: bold;
-  font-size: 0.7rem;
-} 
-
-/* Botones navegación calendario */
-#calendarioVisual > div:first-child {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+.calendario-dia.hoy {
+  border-color: var(--accent-color);
+  box-shadow: inset 0 0 0 1px var(--accent-color);
 }
 
-#calendarioVisual button#btnMesAnterior,
-#calendarioVisual button#btnMesSiguiente {
-  background-color: #ff3b30;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-#calendarioVisual button#btnMesAnterior:hover,
-#calendarioVisual button#btnMesSiguiente:hover {
-  background-color: #ff1f0f;
-}
-
-#mesActualLabel {
-  font-weight: bold;
-  color: #fff;
-  font-size: 1rem;
-  user-select: none;
-}
-/* Estilo para días libres en calendario visual */
 .calendario-dia.libre {
-  background-color: #117a37 !important;
-  color: #d0f0c0;
-  font-weight: bold;
+  background-color: var(--status-libre);
+  border-color: var(--status-libre);
+  color: var(--status-libre-text);
 }
 
 .libre-label {
   color: #a8e6a3;
-  font-weight: bold;
-  font-size: 0.7rem;
-  margin-top: 4px;
+  font-weight: 700;
+  font-size: 0.65rem;
 }
 
-/* Estilos para días festivos */
 .festivo-label {
-  color: #ff3b30;
-  font-weight: bold;
-  font-size: 0.7rem;
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 0.65rem;
 }
 
-/* Calendario mensual tipo Apple Calendar */
-.calendario-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 1rem;
-}
-
-.calendario-header {
-  text-align: center;
-  font-weight: bold;
-  background-color: #2a2a2a;
-  padding: 0.4rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.calendario-dia {
-  background-color: #1c1c1e;
-  border: 1px solid #333;
-  min-height: 70px;
-  padding: 4px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  color: #fff;
-}
-
-.calendario-dia strong {
-  display: block;
-  font-size: 1rem;
-  margin-bottom: 4px;
-}
-
-.calendario-dia.empty {
-  background: transparent;
-  border: none;
-}
-
-/* Botones navegación calendario */
-#calendarioVisual > div:first-child {
+.hora-label {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+  flex-direction: column; /* entrada arriba, salida debajo: cabe en celdas estrechas */
+  font-size: 0.65rem;
 }
 
-#calendarioVisual button#btnMesAnterior,
-#calendarioVisual button#btnMesSiguiente {
-  background-color: #ff3b30;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
+/* --- RESULTADOS DE CÁLCULOS --- */
+.resultado-box {
+  margin-top: 1rem;
+  background-color: var(--bg-input);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--accent-color);
 }
 
-#calendarioVisual button#btnMesAnterior:hover,
-#calendarioVisual button#btnMesSiguiente:hover {
-  background-color: #ff1f0f;
+.resultado-box:empty { display: none; }
+
+.neto-destacado {
+  font-size: 1.15rem;
+  color: var(--ok-color);
+  margin-top: 0.5rem;
 }
 
-#mesActualLabel {
-  font-weight: bold;
-  color: #fff;
-  font-size: 1rem;
-  user-select: none;
+/* --- TABLET / ESCRITORIO --- */
+@media (min-width: 600px) {
+  body { padding-left: 1.25rem; padding-right: 1.25rem; }
+  h1 { font-size: 1.75rem; }
+  .modulo-card { padding: 1.5rem; }
+
+  .grid-form-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-form-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .calendario-grid { gap: 6px; }
+  .calendario-header { font-size: 0.85rem; }
+  .calendario-dia { min-height: 90px; padding: 6px; font-size: 0.8rem; }
+  .calendario-dia strong { font-size: 0.95rem; }
+  .hora-label { flex-direction: row; gap: 0.25rem; font-size: 0.8rem; }
+  .libre-label, .festivo-label { font-size: 0.75rem; }
 }
-/* Mejora visualización móvil del calendario visual*/
-@media (max-width: 600px) {
-  /* Contenedor con scroll horizontal para calendario */
-  #calendarioVisual .calendario-grid {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(90px, 1fr);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    gap: 6px;
+
+@media (min-width: 900px) {
+  /* En pantallas grandes la barra inferior pasa a ser una píldora centrada */
+  .bottom-nav {
+    left: 50%;
+    right: auto;
+    width: 520px;
+    transform: translateX(-50%);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    overflow: hidden;
   }
+}
 
-  /* Ajuste tamaño y padding de cada día */
-  .calendario-dia {
-    min-width: 90px;
-    min-height: 90px;
-    padding: 6px;
-    font-size: 0.85rem;
-  }
-
-  /* Ajustar el header del calendario para que tenga buen tamaño */
-  .calendario-header {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.5rem;
-  }
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  button:active { transform: none; }
 }
