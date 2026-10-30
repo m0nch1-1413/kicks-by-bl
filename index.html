@@ -2,170 +2,197 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- viewport-fit=cover permite usar toda la pantalla (notch / barra de gestos) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>KICKS BY BL STAFF</title>
+
+  <!-- PWA: modo standalone (sin barra del navegador) -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KICKS Staff">
+  <meta name="application-name" content="KICKS Staff">
+  <meta name="theme-color" content="#111111">
+  <meta name="color-scheme" content="dark">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="contenedor-principal">
-  <h1>KICKS BY BL STAFF</h1>
+    <header class="app-header">
+      <h1>KICKS BY BL STAFF</h1>
+    </header>
 
-  <button onclick="mostrarSeccion('horarios')">📅 Horarios</button>
-  <button onclick="mostrarSeccion('calendarioVisual')">📆 Ver Calendario Visual</button>
-  <button onclick="mostrarSeccion('salario')">📊 Mi salario esperado</button>
-  <button onclick="mostrarSeccion('calculadora')">🧮 Calculadora Nómina</button>
+    <main>
+      <!-- SECCIÓN HORARIOS -->
+      <section id="horarios" class="modulo-card">
+        <h2>Horarios semanales</h2>
 
-  
-  <div id="horarios" style="display:none;">
-    <h2>Horarios</h2>
-    <h3>Introduce tu horario semanal</h3>
+        <form id="formSemanal" onsubmit="event.preventDefault();">
+          <div class="grid-form-2">
+            <div>
+              <label for="semana">Semana (número)</label>
+              <input type="number" id="semana" min="1" value="1" inputmode="numeric" required>
+            </div>
+            <div>
+              <label for="baseHoraria">Base horaria semanal</label>
+              <select id="baseHoraria">
+                <option value="12">12 horas</option>
+                <option value="16">16 horas</option>
+                <option value="20">20 horas</option>
+                <option value="24">24 horas</option>
+              </select>
+            </div>
+          </div>
 
-    <label for="semana">Semana:</label>
-    <input type="number" id="semana" min="1" value="1">
+          <div class="grid-form-2">
+            <div>
+              <label for="fechaInicioSemana">Inicio de semana</label>
+              <input type="date" id="fechaInicioSemana" required>
+            </div>
+            <div>
+              <label for="fechaFinSemana">Fin de semana</label>
+              <input type="date" id="fechaFinSemana" required>
+            </div>
+          </div>
 
-    <label for="baseHoraria">Base horaria semanal:</label>
-    <select id="baseHoraria">
-      <option value="12">12 horas</option>
-      <option value="16">16 horas</option>
-      <option value="20">20 horas</option>
-      <option value="24">24 horas</option>
-    </select>
+          <h3>Horario por día</h3>
+          <div id="contenedorDiasForm"></div>
 
-    <label for="fechaInicioSemana">Fecha inicio de semana:</label>
-    <input type="date" id="fechaInicioSemana">
+          <button type="button" id="btnGuardarSemana" class="btn-primario">Guardar semana</button>
+        </form>
 
-    <label for="fechaFinSemana">Fecha fin de semana:</label>
-    <input type="date" id="fechaFinSemana">
+        <hr class="separador">
 
-    <h4>Horario por día</h4>
+        <h3>Semanas guardadas</h3>
+        <div id="listaHorarios"></div>
+      </section>
 
-    <label>Lunes:
-      <input type="time" class="entradaDia" data-dia="Lunes">
-      <input type="time" class="salidaDia" data-dia="Lunes">
-      <input type="checkbox" class="festivoDia" data-dia="Lunes"> Festivo
-      <input type="checkbox" class="libreDia" data-dia="Lunes"> Día libre
-    </label>
-    
-    <label>Martes:
-      <input type="time" class="entradaDia" data-dia="Martes">
-      <input type="time" class="salidaDia" data-dia="Martes">
-      <input type="checkbox" class="festivoDia" data-dia="Martes"> Festivo
-      <input type="checkbox" class="libreDia" data-dia="Martes"> Día libre
-    </label>
+      <!-- SECCIÓN CALENDARIO VISUAL -->
+      <section id="calendarioVisual" class="modulo-card" style="display:none;">
+        <h2>Calendario</h2>
+        <div class="calendario-header-bar">
+          <button type="button" id="btnMesAnterior" class="btn-icono" aria-label="Mes anterior">‹</button>
+          <div id="mesActualLabel" aria-live="polite"></div>
+          <button type="button" id="btnMesSiguiente" class="btn-icono" aria-label="Mes siguiente">›</button>
+        </div>
+        <div id="contenedorCalendario"></div>
+      </section>
 
-    <label>Miércoles:
-      <input type="time" class="entradaDia" data-dia="Miércoles">
-      <input type="time" class="salidaDia" data-dia="Miércoles">
-      <input type="checkbox" class="festivoDia" data-dia="Miércoles"> Festivo
-      <input type="checkbox" class="libreDia" data-dia="Miércoles"> Día libre
-    </label>
+      <!-- SECCIÓN SALARIO ESPERADO -->
+      <section id="salario" class="modulo-card" style="display:none;">
+        <h2>Mi salario esperado</h2>
 
-    <label>Jueves:
-      <input type="time" class="entradaDia" data-dia="Jueves">
-      <input type="time" class="salidaDia" data-dia="Jueves">
-      <input type="checkbox" class="festivoDia" data-dia="Jueves"> Festivo
-      <input type="checkbox" class="libreDia" data-dia="Jueves"> Día libre
-    </label>
+        <div class="form-group">
+          <label for="baseSalarioEsperado">Base horaria semanal contratada</label>
+          <select id="baseSalarioEsperado">
+            <option value="12">12 horas</option>
+            <option value="16">16 horas</option>
+            <option value="20">20 horas</option>
+            <option value="24">24 horas</option>
+            <option value="39">39 horas</option>
+          </select>
+        </div>
 
-    <label>Viernes:
-      <input type="time" class="entradaDia" data-dia="Viernes">
-      <input type="time" class="salidaDia" data-dia="Viernes">
-      <input type="checkbox" class="festivoDia" data-dia="Viernes"> Festivo
-      <input type="checkbox" class="libreDia" data-dia="Viernes"> Día libre
-    </label>
+        <div class="grid-form-2">
+          <div>
+            <label for="semanaInicio">Desde semana</label>
+            <input type="number" id="semanaInicio" min="1" inputmode="numeric">
+          </div>
+          <div>
+            <label for="semanaFin">Hasta semana</label>
+            <input type="number" id="semanaFin" min="1" inputmode="numeric">
+          </div>
+        </div>
 
-    <label>Sábado:
-      <input type="time" class="entradaDia" data-dia="Sábado">
-      <input type="time" class="salidaDia" data-dia="Sábado">
-      <input type="checkbox" class="festivoDia" data-dia="Sábado"> Festivo
-      <input type="checkbox" class="libreDia" data-dia="Sábado"> Día libre
-    </label>
+        <div class="form-group">
+          <label for="irpfSalario">IRPF (%)</label>
+          <input type="number" id="irpfSalario" placeholder="Ejemplo: 12" step="0.1" inputmode="decimal">
+        </div>
 
-    <label>Domingo:
-      <input type="time" class="entradaDia" data-dia="Domingo">
-      <input type="time" class="salidaDia" data-dia="Domingo">
-      <input type="checkbox" class="festivoDia" data-dia="Domingo"> Festivo
-      <input type="checkbox" class="libreDia" data-dia="Domingo"> Día libre
-    </label>
+        <button type="button" id="btnCalcularSalario" class="btn-primario">Calcular salario esperado</button>
 
-    <button type="button" onclick="guardarHorarioSemanal()">Añadir / Modificar Horario Semanal</button>
-    <h4>Horarios Semanales Guardados</h4>
-    <div id="listaHorarios"></div>
+        <div id="resultadoSalario" class="resultado-box"></div>
+      </section>
+
+      <!-- SECCIÓN CALCULADORA NÓMINA -->
+      <section id="calculadora" class="modulo-card" style="display:none;">
+        <h2>Calculadora de nómina</h2>
+
+        <div class="form-group">
+          <label for="base">Base salarial</label>
+          <select id="base">
+            <option value="1000">12 hrs (1000€)</option>
+            <option value="591.71">16 hrs (591.71€)</option>
+            <option value="770.59">20 hrs (770.59€)</option>
+            <option value="887.48">24 hrs (887.48€)</option>
+            <option value="2000">39 hrs (2000€)</option>
+          </select>
+        </div>
+
+        <div class="grid-form-3">
+          <div>
+            <label for="horasComp">Horas complementarias</label>
+            <input type="number" id="horasComp" placeholder="0" min="0" step="0.5" inputmode="decimal">
+          </div>
+          <div>
+            <label for="horasFest">Horas festivas</label>
+            <input type="number" id="horasFest" placeholder="0" min="0" step="0.5" inputmode="decimal">
+          </div>
+          <div>
+            <label for="horasNoct">Horas nocturnas</label>
+            <input type="number" id="horasNoct" placeholder="0" min="0" step="0.5" inputmode="decimal">
+          </div>
+        </div>
+
+        <div class="grid-form-2">
+          <div>
+            <label for="ssSelect">Seguridad Social (%)</label>
+            <select id="ssSelect">
+              <option value="6.5">6.5 %</option>
+              <option value="personalizado">Personalizado</option>
+            </select>
+            <input type="number" id="ssPersonalizado" placeholder="%" style="display:none; margin-top:0.5rem;" step="0.1" inputmode="decimal">
+          </div>
+          <div>
+            <label for="irpf">IRPF (%)</label>
+            <input type="number" id="irpf" placeholder="Ej. 12" step="0.1" inputmode="decimal">
+          </div>
+        </div>
+
+        <button type="button" id="btnCalcularNomina" class="btn-primario">Calcular nómina</button>
+
+        <div id="resultado" class="resultado-box"></div>
+      </section>
+    </main>
   </div>
 
-  <div id="calendarioVisual" style="display:none; background-color:#1c1c1e; border-radius:8px; padding:1rem; margin-top:1rem;">
-    <h2>Calendario Visual de Horarios</h2>
-    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-      <button id="btnMesAnterior">◀️ Mes anterior</button>
-      <div id="mesActualLabel" style="font-weight: bold; color: #fff;"></div>
-      <button id="btnMesSiguiente">▶️ Mes siguiente</button>
-    </div>
-    <div id="contenedorCalendario"></div>
-  </div>
-
-  <div id="salario" style="display:none;">
-    <h2>Mi salario esperado</h2>
-  
-    <label for="baseSalarioEsperado">Base horaria semanal:</label>
-    <select id="baseSalarioEsperado">
-      <option value="12">12 horas</option>
-      <option value="16">16 horas</option>
-      <option value="20">20 horas</option>
-      <option value="24">24 horas</option>
-      <option value="39">39 horas</option>
-    </select>
-  
-    <label for="semanaInicio">Desde semana:</label>
-    <input type="number" id="semanaInicio" min="1">
-  
-    <label for="semanaFin">Hasta semana:</label>
-    <input type="number" id="semanaFin" min="1">
-  
-    <label for="irpfSalario">IRPF (%):</label>
-    <input type="number" id="irpfSalario" placeholder="Ejemplo: 12">
-  
-    <button onclick="calcularSalarioEsperado()">Calcular Salario Esperado</button>
-  
-    <div id="resultadoSalario"></div>
-  </div>
-
-  <div id="calculadora" style="display:none;">
-    <h2>Calculadora de la dolorosa 🫠</h2>
-
-    <label for="base">Selecciona base salarial:</label>
-    <select id="base">
-      <option value="1000">12</option>
-      <option value="591.71">16</option>
-      <option value="739.52">20</option>
-      <option value="887.48">24</option>
-      <option value="2000">39</option>
-    </select>
-
-    <label for="horasComp">Número de horas complementarias:</label>
-    <input type="number" id="horasComp" placeholder="Introduce horas complementarias" />
-
-    <label for="horasFest">Número de horas festivas:</label>
-    <input type="number" id="horasFest" placeholder="Introduce horas festivas" />
-
-    <label for="horasNoct">Número de horas nocturnas:</label>
-    <input type="number" id="horasNoct" placeholder="Introduce horas nocturnas" />
-
-    <label for="ssSelect">Seguridad Social (%):</label>
-    <select id="ssSelect" onchange="mostrarPersonalizado()">
-      <option value="6.48">6.48 %</option>
-      <option value="personalizado">Personalizado</option>
-    </select>
-    <input type="number" id="ssPersonalizado" placeholder="Introduce % personalizado" style="display:none;" />
-
-    <label for="irpf">IRPF (%):</label>
-    <input type="number" id="irpf" placeholder="Ejemplo: 12" />
-
-    <button onclick="calcularNomina()">Calcular Nómina</button>
-
-    <div id="resultado"></div>
-  </div>
-
+  <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <button type="button" data-target-section="horarios" aria-current="page">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span>Horarios</span>
+    </button>
+    <button type="button" data-target-section="calendarioVisual">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <span>Calendario</span>
+    </button>
+    <button type="button" data-target-section="salario">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7a6 6 0 1 0 0 10M5 10h9M5 14h9"/></svg>
+      <span>Salario</span>
+    </button>
+    <button type="button" data-target-section="calculadora">
+      <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>
+      <span>Nómina</span>
+    </button>
+  </nav>
 
   <script src="app.js"></script>
 </body>
